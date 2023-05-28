@@ -1,4 +1,4 @@
-import React, { memo, useMemo, useState, useEffect, useRef } from "react";
+import React, { memo, useMemo, useState, useEffect, useRef, SyntheticEvent } from "react";
 import { nanoid } from "nanoid";
 import { useDrop } from 'react-dnd';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,14 +18,16 @@ import DefaultConstructorElement from "./components/default-constructor-element/
 import ConstructorIngredient from "./components/constructor-ingredient/constructor-ingredient";
 import { postOrder } from "../../utils/api";
 import styles from "./burger-constructor.module.css";
+import { IIngredient, IAddedIngredient } from '../../types/ingredient.js';
+
 
 const BurgerConstructor = memo(() => {
   const [isScroll, setIsScroll] = useState(false);
-  const {userName} = useSelector(getUserData);
+  const { userName } = useSelector(getUserData);
   const ingredients = useSelector(getChosenIngredients);
-  const {bun, stuffing} = ingredients;
+  const { bun, stuffing } = ingredients;
 
-  const stuffingContainer = useRef(null);
+  const stuffingContainer = useRef<HTMLDivElement | null>(null);
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -35,7 +37,7 @@ const BurgerConstructor = memo(() => {
 
   const chosenIngredientsId = () => {
     if (!bun) {
-      return stuffing.map(item => item._id);
+      return stuffing.map((item: IIngredient) => item._id);
     }
     if (!stuffing.length) {
       return bun._id;
@@ -48,7 +50,7 @@ const BurgerConstructor = memo(() => {
       return 0;
     }
 
-    let totalPrice = stuffing.reduce((acc, item) => acc + item?.price, 0);
+    let totalPrice = stuffing.reduce((acc: number, item: IIngredient) => acc + item?.price, 0);
     if (bun) {
       totalPrice += bun.price * 2;
     }
@@ -56,31 +58,32 @@ const BurgerConstructor = memo(() => {
   }, [bun, stuffing]);
 
   useEffect(() => {
-    if (stuffingContainer.current.clientHeight >= 464) {
+    if (stuffingContainer.current && stuffingContainer.current?.clientHeight >= 464) {
       setIsScroll(true)
     }
   }, [setIsScroll]);
 
-  const makeOrder = (e) => {
+  const makeOrder = (e: SyntheticEvent<Element, Event>) => {
+    console.log(e);
     e.preventDefault();
 
     if (!userName) {
-      return navigate("/login", {state: {from: location}});
+      return navigate("/login", { state: { from: location } });
     }
 
     if (isPrice()) {
       postOrder(`${process.env.REACT_APP_BURGER_API_URL}/orders`, {
         method: "POST",
-        body: JSON.stringify({ingredients: chosenIngredientsId()}),
-        headers: {"Content-type": "application/json; charset=UTF-8"}
+        body: JSON.stringify({ ingredients: chosenIngredientsId() }),
+        headers: { "Content-type": "application/json; charset=UTF-8" }
       })
         .then(res => {
-          dispatch({type: SET_MODAL_TYPE, payload: "orderDetails"})
-          dispatch({type: SET_ORDER_NUMBER, payload: res.order.number});
-          dispatch({type: OPEN_MODAL});
+          dispatch({ type: SET_MODAL_TYPE, payload: "orderDetails" })
+          dispatch({ type: SET_ORDER_NUMBER, payload: res.order.number });
+          dispatch({ type: OPEN_MODAL });
         })
         .catch(e => {
-          dispatch({type: GET_ORDER_INGREDIENTS_FAILED});
+          dispatch({ type: GET_ORDER_INGREDIENTS_FAILED });
           console.error(e);
         });
     } else {
@@ -88,23 +91,23 @@ const BurgerConstructor = memo(() => {
     }
   }
 
-  const [{isOverCurrent}, dropTargetRefBun] = useDrop({
+  const [{ isOverCurrent }, dropTargetRefBun] = useDrop({
     accept: "bun",
-    drop(item) {
-      dispatch({type: SET_BUN, payload: item})
-      dispatch({type: INCREASE_INGREDIENTS_COUNT, payload: item.name})
+    drop(item: IIngredient) {
+      dispatch({ type: SET_BUN, payload: item })
+      dispatch({ type: INCREASE_INGREDIENTS_COUNT, payload: item.name })
     },
     collect: monitor => ({
-      isOverCurrent: monitor.isOver({shallow: true}),
+      isOverCurrent: monitor.isOver({ shallow: true }),
     })
   });
 
-  const [{isHover}, dropTargetRef] = useDrop({
+  const [{ isHover }, dropTargetRef] = useDrop({
     accept: "stuffing",
-    drop(item) {
-      if (!item.sortId) {
-        dispatch({type: SET_STUFFING_INGREDIENT, payload: {...item, sortId: nanoid(10)}})
-        dispatch({type: INCREASE_INGREDIENTS_COUNT, payload: item.name})
+    drop(item: IIngredient | IAddedIngredient) {
+      if (!("sortId" in item)) {
+        dispatch({ type: SET_STUFFING_INGREDIENT, payload: { ...item, sortId: nanoid(10) } });
+        dispatch({ type: INCREASE_INGREDIENTS_COUNT, payload: item.name });
       }
     },
     collect: monitor => ({
@@ -143,7 +146,7 @@ const BurgerConstructor = memo(() => {
               ?
               <DefaultConstructorElement extraClass={bunStyle} isHover={isHover} text="Выберите начинку" />
               :
-              stuffing.map((item, index) => <ConstructorIngredient
+              stuffing.map((item:IAddedIngredient, index:number) => <ConstructorIngredient
                 key={item.sortId}
                 item={item}
                 index={index}

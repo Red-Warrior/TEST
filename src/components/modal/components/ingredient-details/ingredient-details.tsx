@@ -1,18 +1,20 @@
-import React, { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect, FC } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import styles from "./ingredient-details.module.css";
 import { getIngredients } from "../../../../services/ingredients/actions";
 import { getStoreIngredients } from "../../../../services/ingredients/selectors";
 
-const IngredientDetails = () => {
+import { IIngredient } from '../../../../types/ingredient.js';
+
+const IngredientDetails: FC = () => {
   const {ingredients} = useSelector(getStoreIngredients);
   const {id} = useParams();
   const dispatch = useDispatch();
 
   const currentIngredient = useMemo(() => {
     if (ingredients.length) {
-      return ingredients.find(ingredient => ingredient._id === id)
+      return ingredients.find((ingredient: IIngredient) => ingredient._id === id)
     }
     return undefined;
   }, [ingredients, id]);
@@ -32,6 +34,8 @@ const IngredientDetails = () => {
   useEffect(
     () => {
       if (!ingredients.length) {
+        // TODO
+        // @ts-ignore
         dispatch(getIngredients());
       }
     },
@@ -49,7 +53,7 @@ const IngredientDetails = () => {
           Object.keys(property).map(item =>
             <li key={item} className={styles.component}>
               <span className="text text_type_main-default text_color_inactive">{item}</span>
-              <span className="text text_type_digits-default text_color_inactive">{property[item]}</span>
+              <span className="text text_type_digits-default text_color_inactive">{property[item as keyof typeof property]}</span>
             </li>
           )
         }

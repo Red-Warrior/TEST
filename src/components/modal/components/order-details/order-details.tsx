@@ -1,11 +1,11 @@
-import React, { memo } from "react";
+import React, { FC } from "react";
 import { useSelector } from "react-redux";
 import icon from "../../../../images/done.png";
 import styles from "./order-details.module.css";
 import { getChosenIngredients } from "../../../../services/burger-constructor/selectors";
 
-const OrderDetails = memo(() => {
-  const {orderNumber} = useSelector(getChosenIngredients);
+const OrderDetails: FC = () => {
+  const { orderNumber } = useSelector(getChosenIngredients);
 
   return (
     <div className={styles.order}>
@@ -24,6 +24,6 @@ const OrderDetails = memo(() => {
       </p>
     </div>
   );
-});
+};
 
 export default OrderDetails;

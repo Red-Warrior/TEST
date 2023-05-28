@@ -1,18 +1,18 @@
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
 import { Link, Navigate } from "react-router-dom";
 import { Input, Button } from "@ya.praktikum/react-developer-burger-ui-components";
 import { useDispatch, useSelector } from "react-redux";
 import { getUserData } from "../../services/user/selectors";
 import { registerUserRequest } from "../../services/user/actions";
 
-const RegisterPage = () => {
-  const {userName} = useSelector(getUserData);
-  const [passwordVisibility, setPasswordVisibility] = useState("password");
-  const [userData, setUserData] = useState({name: "", email: "", password: ""});
+const RegisterPage: FC = () => {
+  const { userName } = useSelector(getUserData);
+  const [passwordVisibility, setPasswordVisibility] = useState<"password" | "text">("password");
+  const [userData, setUserData] = useState({ name: "", email: "", password: "" });
 
   const dispatch = useDispatch();
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target;
     setUserData((prevState) => ({
       ...prevState,
@@ -20,9 +20,11 @@ const RegisterPage = () => {
     }));
   };
 
-  const registration = (e) => {
+  const registration = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (userData.name && userData.email && userData.password) {
+      // TODO
+      // @ts-ignore
       dispatch(registerUserRequest(userData));
     } else {
       alert("Проверьте, что поля: Имя, E-mail, Пароль заполнены");
@@ -36,7 +38,7 @@ const RegisterPage = () => {
     return <Navigate to="/" replace />
   }
 
-  const {name, email, password} = userData;
+  const { name, email, password } = userData;
   return (
     <main className="stellarContainer">
       <h2 className="text text_type_main-medium mb-6">Регистрация</h2>

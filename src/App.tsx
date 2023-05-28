@@ -1,3 +1,4 @@
+import { FC } from 'react';
 import { Routes, Route, useLocation } from "react-router-dom";
 import ProtectedRouteElement from "./components/protected-route-element";
 import {
@@ -13,7 +14,7 @@ import {
   LayoutPage
 } from "./pages";
 
-const App = () => {
+const App: FC = () => {
   const location = useLocation();
   const background = location.state && location.state.background;
 

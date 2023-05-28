@@ -1,10 +1,18 @@
-import React, { memo } from "react";
+import React, { FC, memo } from "react";
 import PropTypes from "prop-types";
 import ingredientsPropTypes from "../../utils/ingredientsPropTypes";
 import Card from "../card/card";
 import styles from "./category.module.css";
 
-const Category = memo(({title, ingredients, extraClass}) => {
+import { IIngredient } from '../../types/ingredient.js';
+
+interface ICategoryProps {
+title: string;
+ingredients: IIngredient[];
+extraClass: string;
+}
+
+const Category: FC<ICategoryProps> = memo(({title, ingredients, extraClass}) => {
   return (
     <section className={`mt-10 ${extraClass}`}>
       <h2 className={`${styles.title} text text_type_main-medium mb-6`}>{title}</h2>

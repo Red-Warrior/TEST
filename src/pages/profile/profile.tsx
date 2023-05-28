@@ -13,10 +13,16 @@ const fieldsChecklist = {
   password: "isPasswordEditable"
 };
 
+interface IFieldsEditable {
+  isNameEditable: boolean;
+  isLoginEditable: boolean;
+  isPasswordEditable: boolean;
+}
+
 const ProfilePage = () => {
   const dispatch = useDispatch();
 
-  const {userName, userEmail} = useSelector(getUserData);
+  const { userName, userEmail } = useSelector(getUserData);
 
   const [userData, setUserData] = useState({
     name: userName,
@@ -24,18 +30,19 @@ const ProfilePage = () => {
     password: "*****"
   });
 
-  const [isFieldsEditable, setFieldsEditable] = useState({
+
+  const [isFieldsEditable, setFieldsEditable] = useState<IFieldsEditable>({
     isNameEditable: false,
     isLoginEditable: false,
     isPasswordEditable: false
   });
 
-  const nameRef = useRef();
-  const emailRef = useRef();
-  const passwordRef = useRef();
+  const nameRef = useRef<HTMLInputElement | null>(null);
+  const emailRef = useRef<HTMLInputElement | null>(null);
+  const passwordRef = useRef<HTMLInputElement | null>(null);
 
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target = e.target;
 
     setUserData((prevState) => ({
@@ -44,13 +51,13 @@ const ProfilePage = () => {
     }));
   };
 
-  const setEditableField = (e) => {
+  const setEditableField = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
-    const target = e.currentTarget.parentNode.childNodes[1];
+    const target = e.currentTarget.parentNode?.childNodes[1] as HTMLInputElement;
 
     setFieldsEditable((prevState) => ({
       ...prevState,
-      [fieldsChecklist[target.name]]: !prevState[fieldsChecklist[target.name]],
+      [fieldsChecklist[target.name as keyof typeof fieldsChecklist]]: !prevState[fieldsChecklist[target.name]],
     }));
     setTimeout(() => target.focus());
   }
@@ -63,7 +70,7 @@ const ProfilePage = () => {
     })
   }
 
-  const resetFields = (e) => {
+  const resetFields = (e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     e.preventDefault();
     setUserData({
       name: userName,
@@ -73,23 +80,27 @@ const ProfilePage = () => {
     canselEdit();
   };
 
-  const editUserRequest = (e) => {
+  const editUserRequest = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (userData.password === "*****") {
       return alert("Введите ваш старый или новый пароль");
     }
+    // TODO
+    // @ts-ignore
     dispatch(updateUserRequest(userData));
   };
 
-  const logout = async (e) => {
+  const logout = async (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     e.preventDefault();
+    // TODO
+    // @ts-ignore
     dispatch(logoutUserRequest());
   };
 
   useEffect(() => {
     if (isFieldsEditable.isNameEditable) nameRef.current.focus();
-    if (isFieldsEditable.isLoginEditable) emailRef.current.focus();
-    if (isFieldsEditable.isPasswordEditable) passwordRef.current.focus();
+    if (isFieldsEditable.isLoginEditable) emailRef.current?.focus();
+    if (isFieldsEditable.isPasswordEditable) passwordRef.current?.focus();
   }, [isFieldsEditable]);
 
   const previousNameOfUser = useRef(userName);
@@ -101,25 +112,25 @@ const ProfilePage = () => {
 
 
   const linkTextStyle = "text text_type_main-medium text_color_inactive"
-  const {isNameEditable, isLoginEditable, isPasswordEditable} = isFieldsEditable;
+  const { isNameEditable, isLoginEditable, isPasswordEditable } = isFieldsEditable;
 
   return (
     <main className={`${styles.profile} mt-30`}>
       <nav className={styles.navBar}>
-        <NavLink to="/profile" className={({isActive}) =>
+        <NavLink to="/profile" className={({ isActive }) =>
           `${styles.navItem} ${linkTextStyle} ${linkStyles.active}`}
         >
           Профиль
         </NavLink>
-        <NavLink to="orders" className={({isActive}) =>
+        <NavLink to="orders" className={({ isActive }) =>
           `${styles.navItem} ${linkTextStyle}`}
         >
           История заказов
         </NavLink>
         <NavLink
           to="/"
-          className={({isActive}) => `${styles.navItem} ${linkTextStyle}`}
-          onClick={e => logout(e)}
+          className={({ isActive }) => `${styles.navItem} ${linkTextStyle}`}
+          onClick={(e) => logout(e)}
         >
           Выход
         </NavLink>

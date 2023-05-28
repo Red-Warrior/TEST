@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { FC } from 'react';
+import { useNavigate } from "react-router-dom";
+import styles from './app-header.module.css';
+
 import { Logo, BurgerIcon, ListIcon, ProfileIcon } from "@ya.praktikum/react-developer-burger-ui-components";
 import RouterLink from "./components/router-link/router-link";
-import styles from './app-header.module.css';
-import { useNavigate } from "react-router-dom";
 
-const AppHeader = () => {
+const AppHeader: FC = () => {
   const navigate = useNavigate();
 
   const defaultStyle = "ml-2 text text_type_main-default";

@@ -1,4 +1,4 @@
-import React, { memo } from "react";
+import React, { FC, memo } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import { getStoreIngredients } from "../../services/ingredients/selectors";
 import { getChosenIngredients } from "../../services/burger-constructor/selectors";
@@ -6,11 +6,16 @@ import { SET_SELECTED_INGREDIENT } from "../../services/current-ingredient/actio
 
 import { useDrag } from 'react-dnd';
 import { useLocation, useNavigate } from "react-router-dom";
-import ingredientsPropTypes from "../../utils/ingredientsPropTypes";
 import { CurrencyIcon, Counter } from "@ya.praktikum/react-developer-burger-ui-components";
 import styles from "./card.module.css";
 
-const Card = memo(({ingredient}) => {
+import { IIngredient } from '../../types/ingredient.js';
+
+interface ICardProps {
+  ingredient: IIngredient;
+}
+
+const Card: FC<ICardProps> = memo(({ ingredient }) => {
   const dispatch = useDispatch();
   const location = useLocation();
   const navigate = useNavigate();
@@ -26,7 +31,7 @@ const Card = memo(({ingredient}) => {
     })
   });
 
-  const handleOpenModal = (e) => {
+  const handleOpenModal = (e:  React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     e.preventDefault();
 
     dispatch({type: SET_SELECTED_INGREDIENT, payload: ingredient});
@@ -63,7 +68,3 @@ const Card = memo(({ingredient}) => {
 });
 
 export default Card;
-
-Card.propTypes = {
-  ingredient: ingredientsPropTypes.isRequired
-};
